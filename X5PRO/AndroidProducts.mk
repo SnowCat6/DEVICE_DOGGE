@@ -1,0 +1,4 @@
+PRODUCT_MAKEFILES := \
+	$(LOCAL_DIR)/full_X5PROx32.mk \
+	$(LOCAL_DIR)/full_X5PROx64.mk
+
