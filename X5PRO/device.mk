@@ -1,3 +1,6 @@
+########################################################
+# inherit 6752 platform
+$(call inherit-product, device/mediatek/mt6735/device.mk)
 
 ########################################################
 # GSENSOR
@@ -33,7 +36,8 @@ DEVICE_PACKAGE_OVERLAYS += device/mediatek/common/overlay/navbar
 
 # Add proprietary binary files
 PRODUCT_COPY_FILES += \
-    $(call find-copy-subdir-files,*,$(LOCAL_PATH)/system,system)
+	$(call find-copy-subdir-files,*,$(LOCAL_PATH)/system,system) \
+	$(call find-copy-subdir-files,*,$(LOCAL_PATH)/system-$(THIS_ANDROID_VERSION),system)
 
 # Add proprietary files to ram-fs for boot.img
 PRODUCT_COPY_FILES += \
@@ -75,32 +79,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	ro.sf.lcd_density=320 \
 	qemu.hw.mainkeys=1
 
-########################################################
-# inherit 6752 platform
-$(call inherit-product, device/mediatek/mt6735/device.mk)
-$(call inherit-product-if-exists, vendor/vanzo/libs/$(MTK_BASE_PROJECT)/device-vendor.mk)
+$(call inherit-product-if-exists, vendor/DOOGEE/libs/$(MTK_BASE_PROJECT)/device-vendor.mk)
 
-########################################################
-# GAPPS apps
-GAPPS_VARIANT := pico
-PRODUCT_PACKAGES += PrebuiltGmail \
-                    GoogleTTS \
-                    Maps \
-                    Drive \
-                    TranslatePrebuilt \
-                    GoogleHome \
-                    PrebuiltDeskClockGoogle \
-                    CalendarGooglePrebuilt \
-                    LatinImeGoogle \
-                    Chrome \
-                    Music2 \
-                    Music2 \
-                    Newsstand \
-                    YouTube
-
-#PRODUCT_PACKAGES += 
-
-#                    GoogleEarth \
-
-$(call inherit-product, vendor/google/build/opengapps-packages.mk)
+include $(LOCAL_PATH)/prebuilds.mk
 
