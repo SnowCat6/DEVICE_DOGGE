@@ -16,16 +16,23 @@ PRODUCT_PACKAGES += PrebuiltGmail \
                     Newsstand \
                     YouTube
 
-#PRODUCT_PACKAGES += 
-
+#                    WebViewGoogle \
 #                    GoogleEarth \
 
 $(call inherit-product-if-exists, vendor/google/build/opengapps-packages.mk)
 
-
-REMOVE_APP = QuickSearchBox \
+REMOVE_APP = \
+	QuickSearchBox \
 	PicoTts \
 	DeskClock \
-	Browser
+	Browser \
+	LatinIME \
+	Email \
+	Calendar \
+	DeskClock
 
+#        webview \
+
+# NOT TESTED YET
 PRODUCT_PACKAGES := $(filter-out $(REMOVE_APP),$(PRODUCT_PACKAGES))
+

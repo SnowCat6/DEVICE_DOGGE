@@ -36,13 +36,13 @@ ifeq ($(TARGET_BUILD_VARIANT), eng)
 KERNEL_DEBUG := _debug
 endif
 
-KERNEL_DEFCONFIG ?= X5PRO_6735m$(KERNEL_DEBUG)_defconfig
-
 ifeq (5x, $(THIS_ANDROID_VERSION))
 LINUX_KERNEL_VERSION = kernel-3.10
+KERNEL_DEFCONFIG ?= X5PRO_6735m$(KERNEL_DEBUG)_defconfig
 endif
 ifeq (6x, $(THIS_ANDROID_VERSION))
 LINUX_KERNEL_VERSION = kernel-3.18
+KERNEL_DEFCONFIG ?= X5PRO_6735m$(KERNEL_DEBUG)_defconfig
 endif
 
 # overlay has priorities. high <-> low.
