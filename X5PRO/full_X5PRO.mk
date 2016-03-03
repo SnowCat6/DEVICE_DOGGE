@@ -1,10 +1,10 @@
 # Inherit from those products. Most specific first.
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base.mk)
 
-ifeq (5.1, $(PLATFORM_VERSION))
+ifneq (, $(filter 5.%, $(PLATFORM_VERSION)))
 THIS_ANDROID_VERSION :=5x
 endif
-ifeq (6.0, $(PLATFORM_VERSION))
+ifneq (, $(filter 6.%, $(PLATFORM_VERSION)))
 THIS_ANDROID_VERSION :=6x
 endif
 
