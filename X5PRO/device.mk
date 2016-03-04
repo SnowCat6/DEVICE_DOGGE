@@ -73,7 +73,12 @@ else
 endif
 
 # DISABLE ENCRYPT
-ADDITIONAL_DEFAULT_PROPERTIES += ro.crypto.state=unencrypted
+ADDITIONAL_DEFAULT_PROPERTIES += \
+	ro.crypto.state=unencrypted \
+	ro.adb.secure=0 \
+	ro.secure=0 \
+	ro.allow.mock.location=1 \
+	ro.debuggable=1
 
 PRODUCT_PROPERTY_OVERRIDES += \
 	ro.sf.lcd_density=320 \

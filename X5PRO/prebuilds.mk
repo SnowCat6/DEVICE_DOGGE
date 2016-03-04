@@ -21,6 +21,11 @@ PRODUCT_PACKAGES += PrebuiltGmail \
 
 $(call inherit-product-if-exists, vendor/google/build/opengapps-packages.mk)
 
+# SUPERUSER
+PRODUCT_PACKAGES += \
+	su \
+	busybox
+
 REMOVE_APP = \
 	QuickSearchBox \
 	PicoTts \
