@@ -49,3 +49,7 @@ endif
 DEVICE_PACKAGE_OVERLAYS += device/DOOGEE/$(MTK_BASE_PROJECT)/overlay
 DEVICE_PACKAGE_OVERLAYS += device/DOOGEE/$(MTK_TARGET_PROJECT)/overlay
 
+ifeq ($(MTK_GMO_ROM_OPTIMIZE),yes)
+DEVICE_PACKAGE_OVERLAYS += device/mediatek/common/overlay/slim_ram
+endif
+

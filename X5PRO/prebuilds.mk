@@ -1,11 +1,9 @@
 ########################################################
 # GAPPS apps
 GAPPS_VARIANT := pico
-PRODUCT_PACKAGES += PrebuiltGmail \
+PRODUCT_PACKAGES += \
+                    PrebuiltGmail \
                     GoogleTTS \
-                    Maps \
-                    Drive \
-                    TranslatePrebuilt \
                     GoogleHome \
                     PrebuiltDeskClockGoogle \
                     CalendarGooglePrebuilt \
@@ -16,15 +14,20 @@ PRODUCT_PACKAGES += PrebuiltGmail \
                     Newsstand \
                     YouTube
 
+PRODUCT_PACKAGES += \
+                    Maps \
+                    Drive \
+                    TranslatePrebuilt
+
 #                    WebViewGoogle \
 #                    GoogleEarth \
 
 $(call inherit-product-if-exists, vendor/google/build/opengapps-packages.mk)
 
 # SUPERUSER
-PRODUCT_PACKAGES += \
-	su \
-	busybox
+#PRODUCT_PACKAGES += \
+#	su \
+#	busybox
 
 REMOVE_APP = \
 	QuickSearchBox \
@@ -34,7 +37,10 @@ REMOVE_APP = \
 	LatinIME \
 	Email \
 	Calendar \
-	DeskClock
+	DeskClock \
+	MtkQuickSearchBox \
+	MtkCalendar \
+	MtkBrowser \
 
 #        webview \
 

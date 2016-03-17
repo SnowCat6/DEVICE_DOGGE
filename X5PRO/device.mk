@@ -1,7 +1,6 @@
 ########################################################
 # inherit 6752 platform
 $(call inherit-product, device/mediatek/mt6735/device.mk)
-
 ########################################################
 # GSENSOR
 PRODUCT_COPY_FILES += frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml
@@ -85,6 +84,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	qemu.hw.mainkeys=1
 
 $(call inherit-product-if-exists, vendor/DOOGEE/libs/$(MTK_BASE_PROJECT)/device-vendor.mk)
+$(call inherit-product-if-exists, vendor/mediatek/libs/$(MTK_BASE_PROJECT)/device-vendor.mk)
 
 include $(LOCAL_PATH)/prebuilds.mk
 
