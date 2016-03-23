@@ -2,22 +2,24 @@
 # GAPPS apps
 GAPPS_VARIANT := pico
 PRODUCT_PACKAGES += \
-                    PrebuiltGmail \
                     GoogleTTS \
                     GoogleHome \
                     PrebuiltDeskClockGoogle \
                     CalendarGooglePrebuilt \
                     LatinImeGoogle \
-                    Chrome \
-                    Music2 \
-                    Music2 \
-                    Newsstand \
-                    YouTube
+                    Chrome
 
-PRODUCT_PACKAGES += \
-                    Maps \
-                    Drive \
-                    TranslatePrebuilt
+ifneq ($(WITH_DEXPREOPT), yes)
+
+#PRODUCT_PACKAGES += \
+#                    YouTube
+#                    Maps \
+#                    PrebuiltGmail \
+#                    Newsstand \
+#                    Music2 \
+#                    Drive \
+#                    TranslatePrebuilt
+endif
 
 #                    WebViewGoogle \
 #                    GoogleEarth \
