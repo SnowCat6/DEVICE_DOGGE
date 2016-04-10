@@ -1,6 +1,8 @@
 ########################################################
 # inherit 6752 platform
 $(call inherit-product, device/mediatek/mt6735/device.mk)
+$(call inherit-product-if-exists, vendor/DOOGEE/libs/$(MTK_BASE_PROJECT)/device-vendor.mk)
+$(call inherit-product-if-exists, vendor/mediatek/libs/$(MTK_BASE_PROJECT)/device-vendor.mk)
 ########################################################
 # GSENSOR
 PRODUCT_COPY_FILES += frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml
@@ -73,18 +75,7 @@ endif
 
 # DISABLE ENCRYPT
 ADDITIONAL_DEFAULT_PROPERTIES += \
-	ro.crypto.state=unencrypted \
-	ro.adb.secure=0 \
-	ro.secure=0 \
-	ro.allow.mock.location=1 \
-	ro.debuggable=1
-
-PRODUCT_PROPERTY_OVERRIDES += \
-	ro.sf.lcd_density=320 \
-	qemu.hw.mainkeys=1
-
-$(call inherit-product-if-exists, vendor/DOOGEE/libs/$(MTK_BASE_PROJECT)/device-vendor.mk)
-$(call inherit-product-if-exists, vendor/mediatek/libs/$(MTK_BASE_PROJECT)/device-vendor.mk)
+	ro.crypto.state=unencrypted 
 
 include $(LOCAL_PATH)/prebuilds.mk
 
