@@ -1,7 +1,7 @@
 TARGET_BOARD_PLATFORM := mt6735m
 
 # Enable non DEODEX build
-#WITH_DEXPREOPT := true
+WITH_DEXPREOPT := true
 
 # Use the non-open-source part, if present
 -include vendor/DOOGEE/X5PRO/BoardConfigVendor.mk

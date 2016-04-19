@@ -26,10 +26,9 @@ endif
 
 $(call inherit-product-if-exists, vendor/google/build/opengapps-packages.mk)
 
-# SUPERUSER
 #PRODUCT_PACKAGES += \
-#	su \
 #	busybox
+#	su \
 
 REMOVE_APP = \
 	QuickSearchBox \
@@ -43,9 +42,10 @@ REMOVE_APP = \
 	MtkQuickSearchBox \
 	MtkCalendar \
 	MtkBrowser \
+        SetupWizard \
 
 #        webview \
 
-# NOT TESTED YET
+# NOT WORK YET
 PRODUCT_PACKAGES := $(filter-out $(REMOVE_APP),$(PRODUCT_PACKAGES))
 

@@ -19,5 +19,7 @@
         <item>users</item>
     </string-array>
 
+    <integer name="config_multiuserMaximumUsers">8</integer>
+    <bool name="config_enableMultiUserUI">true</bool>
 
 </resources>
