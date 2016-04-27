@@ -4,7 +4,6 @@ GAPPS_VARIANT := pico
 PRODUCT_PACKAGES += \
                     GoogleTTS \
                     GoogleHome \
-                    PrebuiltDeskClockGoogle \
                     CalendarGooglePrebuilt \
                     LatinImeGoogle \
                     Chrome
@@ -21,29 +20,30 @@ ifneq ($(WITH_DEXPREOPT), yes)
 #                    TranslatePrebuilt
 endif
 
+#                    PrebuiltDeskClockGoogle \
 #                    WebViewGoogle \
 #                    GoogleEarth \
 
 $(call inherit-product-if-exists, vendor/google/build/opengapps-packages.mk)
 
 #PRODUCT_PACKAGES += \
+#        Superuser
 #	busybox
 #	su \
 
-REMOVE_APP = \
+REMOVE_APP := \
 	QuickSearchBox \
 	PicoTts \
-	DeskClock \
 	Browser \
 	LatinIME \
 	Email \
 	Calendar \
-	DeskClock \
 	MtkQuickSearchBox \
 	MtkCalendar \
 	MtkBrowser \
         SetupWizard \
 
+#	DeskClock \
 #        webview \
 
 # NOT WORK YET
