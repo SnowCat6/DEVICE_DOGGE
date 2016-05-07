@@ -16,11 +16,11 @@ PRODUCT_PACKAGES += \
 ifneq ($(WITH_DEXPREOPT), yes)
 
 #PRODUCT_PACKAGES += \
+#                    Music2 \
 #                    YouTube
 #                    Maps \
 #                    PrebuiltGmail \
 #                    Newsstand \
-#                    Music2 \
 #                    Drive \
 #                    TranslatePrebuilt
 endif

@@ -3,6 +3,12 @@ TARGET_BOARD_PLATFORM := mt6735m
 # Enable non DEODEX build
 #WITH_DEXPREOPT := true
 
+# TWRP
+TW_THEME := portrait_hdpi
+RECOVERY_SDCARD_ON_DATA := true
+PRODUCT_COPY_FILES += device/DOOGEE/X5PRO/twrp.fstab:recovery/root/etc/twrp.fstab
+
+
 # Use the non-open-source part, if present
 -include vendor/DOOGEE/X5PRO/BoardConfigVendor.mk
 
