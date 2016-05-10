@@ -339,6 +339,9 @@ LCM_DRIVER *lcm_driver_list[] = {
 #if defined(HCT_RM68200_DSI_VDO_HD_CPT)
 	&hct_rm68200_dsi_vdo_hd_cpt,
 #endif
+#if defined(HCT_ILI9881_DSI_VDO_HD_CPT)
+	&hct_ili9881_dsi_vdo_hd_cpt,
+#endif
 
 #if defined(LG4573B_WVGA_DSI_VDO_LH430MV1)
 	&lg4573b_wvga_dsi_vdo_lh430mv1_drv,
