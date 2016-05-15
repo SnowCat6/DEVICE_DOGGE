@@ -11,6 +11,7 @@ PRODUCT_PACKAGES += \
                     CalendarGooglePrebuilt \
                     LatinImeGoogle \
                     Chrome \
+                    Music2 \
                     Velvet
 
 ifneq ($(WITH_DEXPREOPT), yes)
@@ -25,8 +26,8 @@ ifneq ($(WITH_DEXPREOPT), yes)
 #                    TranslatePrebuilt
 endif
 
-#PRODUCT_PACKAGES += \
-#	busybox
+PRODUCT_PACKAGES += \
+	busybox
 
 #	QuickSearchBox \
 #	PicoTts \
@@ -39,6 +40,7 @@ endif
 #	MtkBrowser \
 #       SetupWizard \
 #       webview \
+#	music
 
 $(call inherit-product-if-exists, vendor/google/build/opengapps-packages.mk)
 
