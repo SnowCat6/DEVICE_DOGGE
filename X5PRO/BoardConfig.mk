@@ -4,6 +4,9 @@ TARGET_BOARD_PLATFORM := mt6735m
 #WITH_DEXPREOPT := true
 
 # TWRP
+RECOVERY_VARIANT := twrp
+TWHAVE_SELINUX := false
+TW_USE_TOOLBOX := false
 TW_THEME := portrait_hdpi
 RECOVERY_SDCARD_ON_DATA := true
 PRODUCT_COPY_FILES += device/DOOGEE/X5PRO/twrp.fstab:recovery/root/etc/twrp.fstab
