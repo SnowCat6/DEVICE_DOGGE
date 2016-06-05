@@ -11,7 +11,6 @@ PRODUCT_PACKAGES += \
                     CalendarGooglePrebuilt \
                     LatinImeGoogle \
                     Chrome \
-                    Music2 \
                     Velvet
 
 ifneq ($(WITH_DEXPREOPT), yes)

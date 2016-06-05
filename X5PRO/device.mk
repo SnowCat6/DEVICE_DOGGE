@@ -73,6 +73,14 @@ else
   PRODUCT_PROPERTY_OVERRIDES += persist.radio.multisim.config=ss
 endif
 
+ifeq (yes,$(strip $(MTK_GMO_ROM_OPTIMIZE)))
+  DEVICE_PACKAGE_OVERLAYS += device/mediatek/common/overlay/slim_rom
+endif
+ifeq (yes,$(strip $(MTK_GMO_RAM_OPTIMIZE)))
+  DEVICE_PACKAGE_OVERLAYS += device/mediatek/common/overlay/slim_ram
+endif
+
+
 # DISABLE ENCRYPT
 ADDITIONAL_DEFAULT_PROPERTIES += \
 	ro.crypto.state=unencrypted 

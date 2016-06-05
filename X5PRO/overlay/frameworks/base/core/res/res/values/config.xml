@@ -22,4 +22,13 @@
     <integer name="config_multiuserMaximumUsers">8</integer>
     <bool name="config_enableMultiUserUI">true</bool>
 
+    <integer name="config_shortPressOnPowerBehavior">1</integer>
+    <bool name="config_enableAutoPowerModes">true</bool>
+
+    <string name="config_dozeComponent">com.android.systemui/com.android.systemui.doze.DozeService</string>
+    <integer name="config_screenBrightnessDoze">5</integer>
+    <bool name="config_dozeAfterScreenOff">true</bool>
+    <bool name="config_powerDecoupleInteractiveModeFromDisplay">true</bool>
+
+
 </resources>

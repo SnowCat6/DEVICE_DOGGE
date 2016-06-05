@@ -131,6 +131,7 @@ service atci_service /system/bin/atci_service
 	user root
         disabled
 	group radio system
+
 service atcid-daemon-u /system/bin/atcid
 	user system
 	group radio system media
@@ -169,4 +170,11 @@ service conn_launcher /system/bin/6620_launcher -p /system/etc/firmware/
 #
 # Connectivity related services (End)
 #
+
+# launch init.d scripts
+service sysinit /system/bin/logwrapper /system/xbin/busybox run-parts /system/etc/init.d
+    class late_start
+    user root
+    group root
+    oneshot
 
