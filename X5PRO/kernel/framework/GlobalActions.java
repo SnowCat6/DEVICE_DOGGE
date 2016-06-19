@@ -93,8 +93,6 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
     /* Valid settings for global actions keys.
      * see config.xml config_globalActionList */
     private static final String GLOBAL_ACTION_KEY_POWER = "power";
-    private static final String GLOBAL_ACTION_KEY_REBOOT = "reboot";
-    private static final String GLOBAL_ACTION_KEY_RECOVERY = "recovery";
     private static final String GLOBAL_ACTION_KEY_AIRPLANE = "airplane";
     private static final String GLOBAL_ACTION_KEY_BUGREPORT = "bugreport";
     private static final String GLOBAL_ACTION_KEY_SILENT = "silent";
@@ -275,11 +273,8 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
             }
             if (GLOBAL_ACTION_KEY_POWER.equals(actionKey)) {
                 mItems.add(new PowerAction());
-            }else if (GLOBAL_ACTION_KEY_REBOOT.equals(actionKey)) {
-                mItems.add(new RebootAction());
-            }else if (GLOBAL_ACTION_KEY_RECOVERY.equals(actionKey)) {
-//                mItems.add(new RecoveryAction());
-            }else if (GLOBAL_ACTION_KEY_AIRPLANE.equals(actionKey)) {
+		mItems.add(new RebootAction());
+            } else if (GLOBAL_ACTION_KEY_AIRPLANE.equals(actionKey)) {
                 mItems.add(mAirplaneModeOn);
             } else if (GLOBAL_ACTION_KEY_BUGREPORT.equals(actionKey)) {
                 if (Settings.Global.getInt(mContext.getContentResolver(),
@@ -375,22 +370,14 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
 
  private final class RebootAction extends SinglePressAction implements LongPressAction {
         private RebootAction() {
-//            super(com.android.internal.R.drawable.ic_lock_reboot,
-//                    R.string.global_action_reboot);
-            super(com.android.internal.R.drawable.ic_lock_power_off,
-                "Reboot");
+            super(com.android.internal.R.drawable.ic_lock_reboot,"Reboot");
         }
 
         @Override
         public boolean onLongPress() {
-            UserManager um = (UserManager) mContext.getSystemService(Context.USER_SERVICE);
-//            if (!um.hasUserRestriction(UserManager.DISALLOW_SAFE_BOOT)) {
-                com.android.server.power.ShutdownThread.reboot(mContext, 
+		com.android.server.power.ShutdownThread.reboot(mContext, 
 			android.os.PowerManager.REBOOT_RECOVERY, false);
-//                mWindowManagerFuncs.rebootSafeMode(true);
-                return true;
- //           }
- //           return false;
+		return true;
         }
 
         @Override
@@ -406,11 +393,8 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         @Override
         public void onPress() {
               com.android.server.power.ShutdownThread.reboot(mContext, null, false);
-//	      ShutdownThread.reboot(mContext, "Reboot", false);
-//            mWindowManagerFuncs.reboot(false);
         }
     }
-
     private Action getBugReportAction() {
         return new SinglePressAction(com.android.internal.R.drawable.ic_lock_bugreport,
                 R.string.bugreport_title) {
