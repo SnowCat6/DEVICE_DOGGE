@@ -1,0 +1,401 @@
+resource {
+  name: "symbols.wordlist"
+  classname: "SymbolTable"
+  params {
+    [greco.SymbolTableParams.id] {
+      filename: "wordlist.syms"
+      fst_field_separator: "\t"
+    }
+  }
+}
+resource {
+  name: "symbols.g2p_phoneme_list"
+  classname: "SymbolTable"
+  params {
+    [greco.SymbolTableParams.id] {
+      filename: "g2p_phonemes.syms"
+      fst_field_separator: "\t"
+      binary: true
+    }
+  }
+}
+resource {
+  name: "symbols.am_phoneme_list"
+  classname: "SymbolTable"
+  params {
+    [greco.SymbolTableParams.id] {
+      filename: "am_phonemes.syms"
+      fst_field_separator: "\t"
+      binary: true
+    }
+  }
+}
+resource {
+  name: "symbols.grapheme_list"
+  classname: "SymbolTable"
+  params {
+    [greco.SymbolTableParams.id] {
+      filename: "g2p_graphemes.syms"
+      fst_field_separator: "\t"
+      binary: true
+    }
+  }
+}
+resource {
+  name: "g2p_model"
+  classname: "NeuralNetworkResource"
+  params {
+    [greco.NeuralNetworkResourceParams.id] {
+      filename: "g2p.data"
+    }
+  }
+}
+resource {
+  name: "lstm_pron_generator"
+  classname: "LstmPronGenerator"
+  params {
+    [greco.LstmPronGeneratorParams.id] {
+      g2p_neural_network_config_ref: "g2p_model"
+      input_symbol_table_ref: "symbols.grapheme_list"
+      output_symbol_table_ref: "symbols.g2p_phoneme_list"
+    }
+  }
+}
+resource {
+  name: "text_transformer"
+  classname: "FstTextTransformer"
+  params {
+    [greco.FstTextTransformerParams.id] {
+      filename: "transform.mfar"
+    }
+  }
+}
+resource {
+  name: "phrase_extractor"
+  classname: "DynamicClassPhraseExtractor"
+  params {
+    [greco.DynamicClassPhraseExtractorParams.id] {
+      phrase_level_text_transformer_ref: "text_transformer"
+    }
+  }
+}
+resource {
+  name: "fst.CONTACT_NAME_FST"
+  classname: "StdMMapFst"
+  params {
+    [greco.FstParams.id] {
+      filename: "CONTACT_NAME.fst"
+    }
+  }
+}
+resource {
+  name: "symbols.CONTACT_NAME_SYMS"
+  classname: "SymbolTable"
+  params {
+    [greco.SymbolTableParams.id] {
+      filename: "CONTACT_NAME.syms"
+      fst_field_separator: "\t"
+      binary: true
+    }
+  }
+}
+resource {
+  name: "dynamic_class_model_CONTACT"
+  classname: "DynamicClassModel"
+  params {
+    [greco.DynamicClassModelParams.id] {
+      phone_syms_ref: "symbols.am_phoneme_list"
+      word_syms_ref: "symbols.wordlist"
+      phrase_extractor_ref: "phrase_extractor"
+      pron_generator_ref: "lstm_pron_generator"
+      dynamic_class_params {
+        output_fst_filename: "CONTACT_NAME.fst"
+        output_syms_filename: "CONTACT_NAME.syms"
+        decorator: "CONTACT"
+        reweight_params {
+          alpha: -2
+          beta: 0.125
+        }
+        class_type: CONTACT_NAME
+        output_fst_resource_name: "fst.CONTACT_NAME_FST"
+        output_syms_resource_name: "symbols.CONTACT_NAME_SYMS"
+      }
+    }
+  }
+}
+resource {
+  name: "context_model"
+  classname: "ContextAwareModelList"
+  params {
+    [greco.ContextAwareModelListParams.id] {
+      context_aware_model_ref: "dynamic_class_model_CONTACT"
+    }
+  }
+}
+resource {
+  name: "fst.TERSE.CLG"
+  classname: "StdFst"
+  params {
+    [greco.FstParams.id] {
+      filename: "CLG.prewalk.fst"
+    }
+  }
+}
+resource {
+  name: "fst.TERSE.U"
+  classname: "StdFst"
+  params {
+    [greco.FstParams.id] {
+      filename: "lexicon.U.fst"
+    }
+  }
+}
+resource {
+  name: "class_normalizer"
+  classname: "ClassNormalizer"
+  params {
+    [greco.FstNormalizerParams.id] {
+      filename: "class_normalizer.mfar"
+    }
+  }
+}
+resource {
+  name: "offensive_word_normalizer"
+  classname: "FstNormalizer"
+  params {
+    [greco.FstNormalizerParams.id] {
+      filename: "offensive_word_normalizer.mfar"
+    }
+  }
+}
+resource {
+  name: "lstm_model"
+  classname: "NeuralNetworkResource"
+  params {
+    [greco.NeuralNetworkResourceParams.id] {
+      filename: "lstm_model.uint8.data"
+    }
+  }
+}
+resource {
+  name: "input_mean_stddev"
+  classname: "MeanStdDev"
+  params {
+    [greco.ProtoParams.id] {
+      filename: "input_mean_std_dev"
+      binary: true
+    }
+  }
+}
+resource {
+  name: "rescoring_lm"
+  classname: "MMapLoudsLm16"
+  params {
+    [greco.MMapLoudsLmParams.id] {
+      filename: "rescoring.fst.louds"
+    }
+  }
+}
+resource {
+  name: "rescoring_vocabulary"
+  classname: "Vocabulary"
+  params {
+    [greco.VocabularyParams.id] {
+      symbols_ref: "symbols.wordlist"
+      unknown_word: "$UNKNOWN"
+    }
+  }
+}
+resource {
+  name: "on_the_fly_rescoring_parameters"
+  classname: "RescoringParams"
+  params {
+    [greco.RescoringParams.id] {
+      type: MMAP_LOUDS_LM
+      model_ref: "rescoring_lm"
+      nonterminals {
+        start_symbol: "<addressnum>"
+        stop_symbol: "</addressnum>"
+        reference_symbol: "$ADDRESSNUM"
+      }
+      nonterminals {
+        start_symbol: "<app>"
+        stop_symbol: "</app>"
+        reference_symbol: "$APP"
+      }
+      nonterminals {
+        start_symbol: "<apt>"
+        stop_symbol: "</apt>"
+        reference_symbol: "$APT"
+      }
+      nonterminals {
+        start_symbol: "<areacode>"
+        stop_symbol: "</areacode>"
+        reference_symbol: "$AREACODE"
+      }
+      nonterminals {
+        start_symbol: "<CONTACT>"
+        stop_symbol: "</CONTACT>"
+        reference_symbol: "$CONTACTS"
+      }
+      nonterminals {
+        start_symbol: "<countrycode>"
+        stop_symbol: "</countrycode>"
+        reference_symbol: "$COUNTRYCODE"
+      }
+      nonterminals {
+        start_symbol: "<day>"
+        stop_symbol: "</day>"
+        reference_symbol: "$DAY"
+      }
+      nonterminals {
+        start_symbol: "<fulldate>"
+        stop_symbol: "</fulldate>"
+        reference_symbol: "$FULLDATE"
+      }
+      nonterminals {
+        start_symbol: "<fullphonenum>"
+        stop_symbol: "</fullphonenum>"
+        reference_symbol: "$FULLPHONENUM"
+      }
+      nonterminals {
+        start_symbol: "<GRAMMARS>"
+        stop_symbol: "</GRAMMARS>"
+        reference_symbol: "$GRAMMARS"
+      }
+      nonterminals {
+        start_symbol: "<money>"
+        stop_symbol: "</money>"
+        reference_symbol: "$MONEY"
+      }
+      nonterminals {
+        start_symbol: "<month>"
+        stop_symbol: "</month>"
+        reference_symbol: "$MONTH"
+      }
+      nonterminals {
+        start_symbol: "<operand>"
+        stop_symbol: "</operand>"
+        reference_symbol: "$OPERAND"
+      }
+      nonterminals {
+        start_symbol: "<ordinal>"
+        stop_symbol: "</ordinal>"
+        reference_symbol: "$ORDINAL"
+      }
+      nonterminals {
+        start_symbol: "<percent>"
+        stop_symbol: "</percent>"
+        reference_symbol: "$PERCENT"
+      }
+      nonterminals {
+        start_symbol: "<personal>"
+        stop_symbol: "</personal>"
+        reference_symbol: "$PERSONAL"
+      }
+      nonterminals {
+        start_symbol: "<phonenum>"
+        stop_symbol: "</phonenum>"
+        reference_symbol: "$PHONENUM"
+      }
+      nonterminals {
+        start_symbol: "<postalcode>"
+        stop_symbol: "</postalcode>"
+        reference_symbol: "$POSTALCODE"
+      }
+      nonterminals {
+        start_symbol: "<prefix>"
+        stop_symbol: "</prefix>"
+        reference_symbol: "$PREFIX"
+      }
+      nonterminals {
+        start_symbol: "<RECENCY>"
+        stop_symbol: "</RECENCY>"
+        reference_symbol: "$RECENCY"
+      }
+      nonterminals {
+        start_symbol: "<reject>"
+        stop_symbol: "</reject>"
+        reference_symbol: "$REJECT"
+      }
+      nonterminals {
+        start_symbol: "<restaurant>"
+        stop_symbol: "</restaurant>"
+        reference_symbol: "$RESTAURANT"
+      }
+      nonterminals {
+        start_symbol: "<song>"
+        stop_symbol: "</song>"
+        reference_symbol: "$SONG"
+      }
+      nonterminals {
+        start_symbol: "<street>"
+        stop_symbol: "</street>"
+        reference_symbol: "$STREET"
+      }
+      nonterminals {
+        start_symbol: "<time>"
+        stop_symbol: "</time>"
+        reference_symbol: "$TIME"
+      }
+      nonterminals {
+        start_symbol: "<unknown>"
+        stop_symbol: "</unknown>"
+        reference_symbol: "$UNKNOWN"
+      }
+      nonterminals {
+        start_symbol: "<year>"
+        stop_symbol: "</year>"
+        reference_symbol: "$YEAR"
+      }
+      lm_params {
+        identifier: STATIC
+      }
+      vocabulary_ref: "rescoring_vocabulary"
+    }
+  }
+}
+session_resource {
+  name: "context"
+  classname: "Context"
+  params {
+    [greco.ContextParams.id] {
+      context_model_ref: "context_model"
+      backoff_alias {
+        alias: "context.fst.CONTACT_NAME_FST"
+        ref: "fst.CONTACT_NAME_FST"
+      }
+      backoff_alias {
+        alias: "context.symbols.CONTACT_NAME_SYMS"
+        ref: "symbols.CONTACT_NAME_SYMS"
+      }
+      recognition_context_ref: "recognition_context"
+    }
+  }
+}
+session_resource {
+  name: "default.neural_network_score_cache"
+  classname: "NNBatchScoreCache"
+  params {
+    [greco.NNBatchScoreCacheResourceParams.id] {
+      output_label_offset: 0
+    }
+  }
+}
+session_resource {
+  name: "decoder_graph"
+  classname: "DynamicDecoderGraph"
+  params {
+    [greco.DynamicDecoderGraphParams.id] {
+      clg_replace_resource: "fst.TERSE.CLG"
+      symbols_resource: "symbols.wordlist"
+      replace_pair {
+        non_terminal: "$CONTACTS"
+        fst_resource: "context.fst.CONTACT_NAME_FST"
+        symbols_resource: "context.symbols.CONTACT_NAME_SYMS"
+      }
+      unique_prons_fst_resource: "fst.TERSE.U"
+    }
+  }
+}
+name: "terse_recognizer:ru_ru:OFFLINE_VOICE_ACTIONS:context_compiler"
