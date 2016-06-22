@@ -42,6 +42,14 @@ on post-fs-data
     chmod 0660 /dev/wmtWifi
     chown system system /dev/wmtWifi
 
+    chmod 0660 /dev/MAINAF
+    chown system camera /dev/MAINAF
+
+    chmod 0660 /dev/MAINAF2
+    chown system camera /dev/MAINAF2
+
+    chmod 0660 /dev/SUBAF
+    chown system camera /dev/SUBAF
 #Camera
 #SMB
     chown system system /proc/smb/ScreenComm
