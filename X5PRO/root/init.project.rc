@@ -50,6 +50,10 @@ on post-fs-data
 
     chmod 0660 /dev/SUBAF
     chown system camera /dev/SUBAF
+
+    chmod 0660 /dev/FM50AF
+    chown system camera /dev/FM50AF
+
 #Camera
 #SMB
     chown system system /proc/smb/ScreenComm
