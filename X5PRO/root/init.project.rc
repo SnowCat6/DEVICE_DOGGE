@@ -156,10 +156,19 @@ service conn_launcher /system/bin/6620_launcher -p /system/etc/firmware/
 # Connectivity related services (End)
 #
 
-# launch init.d scripts
 service sysinit /system/bin/logwrapper /system/xbin/busybox run-parts /system/etc/init.d
-    class late_start
-    user root
-    group root
-    oneshot
+	user root
+	oneshot
+	disabled
+
+on property:sys.initd=1
+	start sysinit
+
+service sysinitloop /system/bin/logwrapper /system/xbin/busybox run-parts /system/etc/init.d.loop
+	user root
+	disabled
+
+on property:sys.initd.loop=1
+	start sysinitloop
+
 
