@@ -26,7 +26,9 @@ ifneq ($(WITH_DEXPREOPT), yes)
 endif
 
 PRODUCT_PACKAGES += \
-	busybox
+	busybox \
+	ViPER4Android \
+	PerformanceControl
 
 #	QuickSearchBox \
 #	PicoTts \
