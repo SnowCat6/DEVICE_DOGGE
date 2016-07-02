@@ -4,6 +4,7 @@ GAPPS_VARIANT := pico
 GAPPS_FORCE_PACKAGE_OVERRIDES := true
 #GAPPS_FORCE_MATCHING_DPI := true
 #DONT_DEXPREOPT_PREBUILTS := true
+$(call inherit-product-if-exists, vendor/google/build/opengapps-packages.mk)
 
 PRODUCT_PACKAGES += \
                     GoogleTTS \
@@ -42,6 +43,9 @@ PRODUCT_PACKAGES += \
 #       SetupWizard \
 #       webview \
 #	music
+PRODUCT_PACKAGES := $(filter-out SetupWizard, $(PRODUCT_PACKAGES))
 
-$(call inherit-product-if-exists, vendor/google/build/opengapps-packages.mk)
+ifeq (5x,$(THIS_ANDROID_VERSION))
+PRODUCT_PACKAGES := $(filter-out Chrome, $(PRODUCT_PACKAGES))
+endif
 
