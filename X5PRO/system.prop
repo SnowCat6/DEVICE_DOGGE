@@ -158,3 +158,6 @@ profiler.hung.dumpdobugreport=false
 #LOGCAT
 logcat.live=disable
 
+dalvik.vm.dex2oat-thread_count=4 
+ro.sys.fw.dex2oat_thread_count=4
+
