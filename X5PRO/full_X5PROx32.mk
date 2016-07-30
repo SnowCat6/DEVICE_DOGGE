@@ -12,9 +12,9 @@ LINUX_KERNEL_VERSION = kernel-3.18
 endif
 
 ifeq (yes,$(MTK_K64_SUPPORT))
-MTK_BUILD_VERNO = DOOGEE-X5pro-Android$(PLATFORM_VERSION)-x64
+MTK_BUILD_VERNO = DOOGEE-X5pro-Android$(PLATFORM_VERSION)-R2.133x64
 else
-MTK_BUILD_VERNO = DOOGEE-X5pro-Android$(PLATFORM_VERSION)-x32
+MTK_BUILD_VERNO = DOOGEE-X5pro-Android$(PLATFORM_VERSION)-R2.133x32
 endif
 
 # Set target and base project for flavor build
