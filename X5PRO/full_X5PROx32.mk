@@ -4,17 +4,24 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base.mk)
 # Detect android compile version
 ifneq (, $(filter 5.%, $(PLATFORM_VERSION)))
 THIS_ANDROID_VERSION :=5x
+THIS_BUILD_VERSION=R1.32
 LINUX_KERNEL_VERSION = kernel-3.10
 endif
 ifneq (, $(filter 6.%, $(PLATFORM_VERSION)))
 THIS_ANDROID_VERSION :=6x
+THIS_BUILD_VERSION=R2.133
+LINUX_KERNEL_VERSION = kernel-3.18
+endif
+ifneq (, $(filter 7.%, $(PLATFORM_VERSION)))
+THIS_ANDROID_VERSION :=7x
+THIS_BUILD_VERSION=N0-PRE.A
 LINUX_KERNEL_VERSION = kernel-3.18
 endif
 
 ifeq (yes,$(MTK_K64_SUPPORT))
-MTK_BUILD_VERNO = DOOGEE-X5pro-Android$(PLATFORM_VERSION)-R2.133x64
+MTK_BUILD_VERNO = DOOGEE-X5pro-Android$(PLATFORM_VERSION)-$(THIS_BUILD_VERSION)x64
 else
-MTK_BUILD_VERNO = DOOGEE-X5pro-Android$(PLATFORM_VERSION)-R2.133x32
+MTK_BUILD_VERNO = DOOGEE-X5pro-Android$(PLATFORM_VERSION)-$(THIS_BUILD_VERSION)x32
 endif
 
 # Set target and base project for flavor build
