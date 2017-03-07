@@ -1,0 +1,831 @@
+stream {
+  name: "input"
+  classname: "AudioDecoderStream"
+}
+stream {
+  name: "waveform_frame"
+  classname: "Framer"
+  params {
+    [greco.FramerParams.id] {
+      frame_size_ms: 25
+      frame_step_ms: 10
+      use_endpointer: true
+    }
+  }
+}
+stream {
+  name: "windowed_frame"
+  classname: "Window"
+  params {
+    [greco.WindowParams.id] {
+      window_type: HANNING
+      window_size_ms: 25
+    }
+  }
+}
+stream {
+  name: "fft_energies"
+  classname: "Fft"
+  params {
+  }
+  params_ref: "fft_params"
+}
+stream {
+  name: "cdf_fft_noise"
+  classname: "SpectralNoise"
+  params {
+    [greco.SpectralNoiseParams.id] {
+    }
+  }
+  params_ref: "fft_params"
+}
+stream {
+  name: "filterbank_energies"
+  classname: "FilterBank"
+  params {
+    [greco.FilterBankParams.id] {
+      channel_count: 40
+      upper_band_limit: 3800
+      lower_band_limit: 125
+    }
+  }
+  params_ref: "fft_params"
+}
+stream {
+  name: "filterbank_energies_stacked"
+  classname: "FrameStacker"
+  params {
+    [greco.FrameStackerParams.id] {
+      input_size: 40
+      left_context: 0
+      right_context: 7
+      sample_every_n: 1
+    }
+  }
+}
+stream {
+  name: "spectral_subtraction"
+  classname: "SpectralSubtractor"
+  params {
+    [greco.SpectralSubtractorParams.id] {
+    }
+  }
+  params_ref: "fft_params"
+}
+stream {
+  name: "filterbank_energies_ep"
+  classname: "FilterBank"
+  params {
+    [greco.FilterBankParams.id] {
+      channel_count: 40
+      summation_domain: SUM_MAGNITUDE
+      output_transform: OUTPUT_LOG
+    }
+  }
+  params_ref: "fft_params"
+}
+stream {
+  name: "vad_posterior"
+  classname: "LstmComputeStream"
+  params {
+    [greco.LstmComputeStreamParams.id] {
+      output_negative_log_probs: false
+      neural_network_config_ref: "vad.acoustic_model"
+      input_mean_stddev_ref: "vad.acoustic_mean_stddev"
+    }
+  }
+}
+stream {
+  name: "vad_decision"
+  classname: "EndpointerStream"
+  params {
+    [greco.EndpointerParams.id] {
+      speech_on_window: 0.7
+      ep_decision_threshold: 0.5
+      type: HYSTERESIS_MACHINE
+    }
+  }
+}
+stream {
+  name: "endpointer_events_to_decoder"
+  classname: "EndpointerEventStream"
+  params {
+    [greco.EndpointerEventParams.id] {
+      pass_through_frames: true
+    }
+  }
+}
+stream {
+  name: "endpointer_events"
+  classname: "EndpointerEventFilterStream"
+}
+stream {
+  name: "vad_decision_for_segmenter"
+  classname: "EndpointerStream"
+  params {
+    [greco.EndpointerParams.id] {
+      ep_decision_threshold: 0.2
+      never_transition_to_silence: true
+    }
+  }
+}
+stream {
+  name: "segmenter"
+  classname: "SegmenterStream"
+  params {
+    [greco.SegmenterParams.id] {
+    }
+  }
+}
+stream {
+  name: "subsampled_filter_bank"
+  classname: "SubsampleStream"
+  params {
+    [greco.SubsampleParams.id] {
+      frame_stride: 3
+    }
+  }
+}
+stream {
+  name: "net_features"
+  classname: "LstmComputeStream"
+  params {
+    [greco.LstmComputeStreamParams.id] {
+      lm_weight: 1
+      ctc_blank_index: 0
+      neural_network_config_ref: "lstm_model"
+      input_mean_stddev_ref: "input_mean_stddev"
+      ctc_blank_scale: 1
+    }
+  }
+}
+stream {
+  name: "decoder_stream"
+  classname: "DecoderEndpointerStream"
+  params {
+    [greco.DecoderParams.id] {
+      symbol_table_ref: "decoder_graph.wordlist"
+      output_alignments: true
+      output_word_conf_features: true
+      score_cache_ref: "default.neural_network_score_cache"
+      num_batch_frames: 1
+      decoder_type: FST_SEARCH
+      output_word_lattice: true
+      partial_lattice_interval_ms: 100
+      compute_lattice_posterior: false
+      decoder_event_interval_ms: 100
+      [greco.FstDecoderParams.id] {
+        decoder_fst_ref: "decoder_graph.fst"
+        search_params_ref: "search_parameters"
+        rescoring_params_ref: "on_the_fly_rescoring_parameters"
+      }
+    }
+    [greco.DecoderEndpointerParams.id] {
+      min_silence_ms: 5000
+      enable_decoder_endpointing: false
+      enable_acoustic_endpointing: true
+      min_vad_silence_ms: 0
+    }
+    [greco.DecoderEndpointerStreamParams.id] {
+    }
+  }
+}
+stream {
+  name: "end_of_utterance_events"
+  classname: "EndpointerEventFilterStream"
+}
+stream {
+  name: "incremental_norm"
+  classname: "IncrementalNorm"
+  params {
+    [greco.IncrementalNormParams.id] {
+      normalizer_ref: "class_normalizer"
+      offensive_word_normalizer_ref: "offensive_word_normalizer"
+      symbol_table_ref: "decoder_graph.wordlist"
+      alternates_config {
+        generator_config {
+          name: "TimedNbestAlternatesGenerator"
+          max_alternates: 5
+          max_nbest: 5
+        }
+        pretextnorm_alternates: false
+      }
+    }
+  }
+}
+stream {
+  name: "recognition_events_filter"
+  classname: "RecognitionEventFilterStream"
+}
+stream {
+  name: "recognition_events"
+  classname: "RecognitionEventStream"
+}
+connect {
+  from: "input"
+  to: "waveform_frame"
+}
+connect {
+  from: "waveform_frame"
+  to: "windowed_frame"
+}
+connect {
+  from: "windowed_frame"
+  to: "fft_energies"
+}
+connect {
+  from: "fft_energies"
+  to: "cdf_fft_noise"
+}
+connect {
+  from: "fft_energies"
+  to: "filterbank_energies"
+}
+connect {
+  from: "filterbank_energies"
+  to: "filterbank_energies_stacked"
+}
+connect {
+  from: "cdf_fft_noise"
+  to: "spectral_subtraction"
+}
+connect {
+  from: "spectral_subtraction"
+  to: "filterbank_energies_ep"
+}
+connect {
+  from: "filterbank_energies_ep"
+  to: "vad_posterior"
+}
+connect {
+  from: "vad_posterior"
+  to: "vad_decision"
+}
+connect {
+  from: "vad_decision"
+  to: "endpointer_events_to_decoder"
+}
+connect {
+  from: "endpointer_events_to_decoder"
+  to: "endpointer_events"
+}
+connect {
+  from: "vad_posterior"
+  to: "vad_decision_for_segmenter"
+}
+connect {
+  from: "filterbank_energies_stacked"
+  to: "segmenter"
+}
+connect {
+  from: "vad_decision_for_segmenter"
+  to: "segmenter"
+}
+connect {
+  from: "segmenter"
+  to: "subsampled_filter_bank"
+}
+connect {
+  from: "subsampled_filter_bank"
+  to: "net_features"
+}
+connect {
+  from: "net_features"
+  to: "decoder_stream"
+}
+connect {
+  from: "endpointer_events_to_decoder"
+  to: "decoder_stream"
+}
+connect {
+  from: "decoder_stream"
+  to: "end_of_utterance_events"
+}
+connect {
+  from: "decoder_stream"
+  to: "incremental_norm"
+}
+connect {
+  from: "incremental_norm"
+  to: "recognition_events_filter"
+}
+connect {
+  from: "recognition_events_filter"
+  to: "recognition_events"
+}
+resource {
+  name: "fft_params"
+  classname: "Params"
+  params {
+    [greco.FftParams.id] {
+      input_length_ms: 25
+      fft_overdrive: true
+    }
+  }
+}
+resource {
+  name: "vad.acoustic_model"
+  classname: "NeuralNetworkResource"
+  params {
+    [greco.NeuralNetworkResourceParams.id] {
+      filename: "ep_portable_model.mmap"
+    }
+  }
+}
+resource {
+  name: "vad.acoustic_mean_stddev"
+  classname: "MeanStdDev"
+  params {
+    [greco.ProtoParams.id] {
+      filename: "ep_portable_mean_stddev"
+      binary: true
+    }
+  }
+}
+resource {
+  name: "search_parameters"
+  classname: "FstSearchParams"
+  params {
+    [speech_decoder.FstSearchParams.id] {
+      max_arcs: 1000
+      local_beam: 14
+      lattice_beam: 12
+      next_pen: 0.069314718
+      loop_pen: 0.069314718
+      word_pen: 0.6
+      num_word_tokens: 5
+      response: WORD_TOKEN_LATTICE
+      score_type: FLOAT
+      histogram_scale: 14
+      epsilon_words: "<addressnum>"
+      epsilon_words: "</addressnum>"
+      epsilon_words: "<app>"
+      epsilon_words: "</app>"
+      epsilon_words: "<apt>"
+      epsilon_words: "</apt>"
+      epsilon_words: "<areacode>"
+      epsilon_words: "</areacode>"
+      epsilon_words: "<CONTACT>"
+      epsilon_words: "</CONTACT>"
+      epsilon_words: "<countrycode>"
+      epsilon_words: "</countrycode>"
+      epsilon_words: "<day>"
+      epsilon_words: "</day>"
+      epsilon_words: "<fulldate>"
+      epsilon_words: "</fulldate>"
+      epsilon_words: "<fullphonenum>"
+      epsilon_words: "</fullphonenum>"
+      epsilon_words: "<GRAMMARS>"
+      epsilon_words: "</GRAMMARS>"
+      epsilon_words: "<money>"
+      epsilon_words: "</money>"
+      epsilon_words: "<month>"
+      epsilon_words: "</month>"
+      epsilon_words: "<operand>"
+      epsilon_words: "</operand>"
+      epsilon_words: "<ordinal>"
+      epsilon_words: "</ordinal>"
+      epsilon_words: "<percent>"
+      epsilon_words: "</percent>"
+      epsilon_words: "<personal>"
+      epsilon_words: "</personal>"
+      epsilon_words: "<phonenum>"
+      epsilon_words: "</phonenum>"
+      epsilon_words: "<postalcode>"
+      epsilon_words: "</postalcode>"
+      epsilon_words: "<prefix>"
+      epsilon_words: "</prefix>"
+      epsilon_words: "<RECENCY>"
+      epsilon_words: "</RECENCY>"
+      epsilon_words: "<reject>"
+      epsilon_words: "</reject>"
+      epsilon_words: "<restaurant>"
+      epsilon_words: "</restaurant>"
+      epsilon_words: "<song>"
+      epsilon_words: "</song>"
+      epsilon_words: "<street>"
+      epsilon_words: "</street>"
+      epsilon_words: "<time>"
+      epsilon_words: "</time>"
+      epsilon_words: "<unknown>"
+      epsilon_words: "</unknown>"
+      epsilon_words: "<year>"
+      epsilon_words: "</year>"
+      sentence_end_symbol: "</S>"
+      expand_decoder_graph: false
+      [speech_decoder.ExpandedFstSearchParams.id] {
+        implicit_loop_model: 2
+      }
+    }
+  }
+}
+resource {
+  name: "symbols.wordlist"
+  classname: "SymbolTable"
+  params {
+    [greco.SymbolTableParams.id] {
+      filename: "wordlist.syms"
+      fst_field_separator: "\t"
+    }
+  }
+}
+resource {
+  name: "symbols.g2p_phoneme_list"
+  classname: "SymbolTable"
+  params {
+    [greco.SymbolTableParams.id] {
+      filename: "g2p_phonemes.syms"
+      fst_field_separator: "\t"
+      binary: true
+    }
+  }
+}
+resource {
+  name: "symbols.am_phoneme_list"
+  classname: "SymbolTable"
+  params {
+    [greco.SymbolTableParams.id] {
+      filename: "am_phonemes.syms"
+      fst_field_separator: "\t"
+      binary: true
+    }
+  }
+}
+resource {
+  name: "symbols.grapheme_list"
+  classname: "SymbolTable"
+  params {
+    [greco.SymbolTableParams.id] {
+      filename: "g2p_graphemes.syms"
+      fst_field_separator: "\t"
+      binary: true
+    }
+  }
+}
+resource {
+  name: "g2p_model"
+  classname: "NeuralNetworkResource"
+  params {
+    [greco.NeuralNetworkResourceParams.id] {
+      filename: "g2p.data"
+    }
+  }
+}
+resource {
+  name: "lstm_pron_generator"
+  classname: "LstmPronGenerator"
+  params {
+    [greco.LstmPronGeneratorParams.id] {
+      g2p_neural_network_config_ref: "g2p_model"
+      input_symbol_table_ref: "symbols.grapheme_list"
+      output_symbol_table_ref: "symbols.g2p_phoneme_list"
+    }
+  }
+}
+resource {
+  name: "text_transformer"
+  classname: "FstTextTransformer"
+  params {
+    [greco.FstTextTransformerParams.id] {
+      filename: "transform.mfar"
+    }
+  }
+}
+resource {
+  name: "phrase_extractor"
+  classname: "DynamicClassPhraseExtractor"
+  params {
+    [greco.DynamicClassPhraseExtractorParams.id] {
+      phrase_level_text_transformer_ref: "text_transformer"
+    }
+  }
+}
+resource {
+  name: "fst.CONTACT_NAME_FST"
+  classname: "StdMMapFst"
+  params {
+    [greco.FstParams.id] {
+      filename: "CONTACT_NAME.fst"
+    }
+  }
+}
+resource {
+  name: "symbols.CONTACT_NAME_SYMS"
+  classname: "SymbolTable"
+  params {
+    [greco.SymbolTableParams.id] {
+      filename: "CONTACT_NAME.syms"
+      fst_field_separator: "\t"
+      binary: true
+    }
+  }
+}
+resource {
+  name: "dynamic_class_model_CONTACT"
+  classname: "DynamicClassModel"
+  params {
+    [greco.DynamicClassModelParams.id] {
+      phone_syms_ref: "symbols.am_phoneme_list"
+      word_syms_ref: "symbols.wordlist"
+      phrase_extractor_ref: "phrase_extractor"
+      pron_generator_ref: "lstm_pron_generator"
+      dynamic_class_params {
+        output_fst_filename: "CONTACT_NAME.fst"
+        output_syms_filename: "CONTACT_NAME.syms"
+        decorator: "CONTACT"
+        reweight_params {
+          alpha: -2
+          beta: 0.125
+        }
+        class_type: CONTACT_NAME
+        output_fst_resource_name: "fst.CONTACT_NAME_FST"
+        output_syms_resource_name: "symbols.CONTACT_NAME_SYMS"
+      }
+    }
+  }
+}
+resource {
+  name: "context_model"
+  classname: "ContextAwareModelList"
+  params {
+    [greco.ContextAwareModelListParams.id] {
+      context_aware_model_ref: "dynamic_class_model_CONTACT"
+    }
+  }
+}
+resource {
+  name: "fst.TERSE.CLG"
+  classname: "StdFst"
+  params {
+    [greco.FstParams.id] {
+      filename: "CLG.prewalk.fst"
+    }
+  }
+}
+resource {
+  name: "fst.TERSE.U"
+  classname: "StdFst"
+  params {
+    [greco.FstParams.id] {
+      filename: "lexicon.U.fst"
+    }
+  }
+}
+resource {
+  name: "class_normalizer"
+  classname: "ClassNormalizer"
+  params {
+    [greco.FstNormalizerParams.id] {
+      filename: "class_normalizer.mfar"
+    }
+  }
+}
+resource {
+  name: "offensive_word_normalizer"
+  classname: "FstNormalizer"
+  params {
+    [greco.FstNormalizerParams.id] {
+      filename: "offensive_word_normalizer.mfar"
+    }
+  }
+}
+resource {
+  name: "lstm_model"
+  classname: "NeuralNetworkResource"
+  params {
+    [greco.NeuralNetworkResourceParams.id] {
+      filename: "lstm_model.uint8.data"
+    }
+  }
+}
+resource {
+  name: "input_mean_stddev"
+  classname: "MeanStdDev"
+  params {
+    [greco.ProtoParams.id] {
+      filename: "input_mean_std_dev"
+      binary: true
+    }
+  }
+}
+resource {
+  name: "rescoring_lm"
+  classname: "MMapLoudsLm16"
+  params {
+    [greco.MMapLoudsLmParams.id] {
+      filename: "rescoring.fst.louds"
+    }
+  }
+}
+resource {
+  name: "rescoring_vocabulary"
+  classname: "Vocabulary"
+  params {
+    [greco.VocabularyParams.id] {
+      symbols_ref: "symbols.wordlist"
+      unknown_word: "$UNKNOWN"
+    }
+  }
+}
+resource {
+  name: "on_the_fly_rescoring_parameters"
+  classname: "RescoringParams"
+  params {
+    [greco.RescoringParams.id] {
+      type: MMAP_LOUDS_LM
+      model_ref: "rescoring_lm"
+      nonterminals {
+        start_symbol: "<addressnum>"
+        stop_symbol: "</addressnum>"
+        reference_symbol: "$ADDRESSNUM"
+      }
+      nonterminals {
+        start_symbol: "<app>"
+        stop_symbol: "</app>"
+        reference_symbol: "$APP"
+      }
+      nonterminals {
+        start_symbol: "<apt>"
+        stop_symbol: "</apt>"
+        reference_symbol: "$APT"
+      }
+      nonterminals {
+        start_symbol: "<areacode>"
+        stop_symbol: "</areacode>"
+        reference_symbol: "$AREACODE"
+      }
+      nonterminals {
+        start_symbol: "<CONTACT>"
+        stop_symbol: "</CONTACT>"
+        reference_symbol: "$CONTACTS"
+      }
+      nonterminals {
+        start_symbol: "<countrycode>"
+        stop_symbol: "</countrycode>"
+        reference_symbol: "$COUNTRYCODE"
+      }
+      nonterminals {
+        start_symbol: "<day>"
+        stop_symbol: "</day>"
+        reference_symbol: "$DAY"
+      }
+      nonterminals {
+        start_symbol: "<fulldate>"
+        stop_symbol: "</fulldate>"
+        reference_symbol: "$FULLDATE"
+      }
+      nonterminals {
+        start_symbol: "<fullphonenum>"
+        stop_symbol: "</fullphonenum>"
+        reference_symbol: "$FULLPHONENUM"
+      }
+      nonterminals {
+        start_symbol: "<GRAMMARS>"
+        stop_symbol: "</GRAMMARS>"
+        reference_symbol: "$GRAMMARS"
+      }
+      nonterminals {
+        start_symbol: "<money>"
+        stop_symbol: "</money>"
+        reference_symbol: "$MONEY"
+      }
+      nonterminals {
+        start_symbol: "<month>"
+        stop_symbol: "</month>"
+        reference_symbol: "$MONTH"
+      }
+      nonterminals {
+        start_symbol: "<operand>"
+        stop_symbol: "</operand>"
+        reference_symbol: "$OPERAND"
+      }
+      nonterminals {
+        start_symbol: "<ordinal>"
+        stop_symbol: "</ordinal>"
+        reference_symbol: "$ORDINAL"
+      }
+      nonterminals {
+        start_symbol: "<percent>"
+        stop_symbol: "</percent>"
+        reference_symbol: "$PERCENT"
+      }
+      nonterminals {
+        start_symbol: "<personal>"
+        stop_symbol: "</personal>"
+        reference_symbol: "$PERSONAL"
+      }
+      nonterminals {
+        start_symbol: "<phonenum>"
+        stop_symbol: "</phonenum>"
+        reference_symbol: "$PHONENUM"
+      }
+      nonterminals {
+        start_symbol: "<postalcode>"
+        stop_symbol: "</postalcode>"
+        reference_symbol: "$POSTALCODE"
+      }
+      nonterminals {
+        start_symbol: "<prefix>"
+        stop_symbol: "</prefix>"
+        reference_symbol: "$PREFIX"
+      }
+      nonterminals {
+        start_symbol: "<RECENCY>"
+        stop_symbol: "</RECENCY>"
+        reference_symbol: "$RECENCY"
+      }
+      nonterminals {
+        start_symbol: "<reject>"
+        stop_symbol: "</reject>"
+        reference_symbol: "$REJECT"
+      }
+      nonterminals {
+        start_symbol: "<restaurant>"
+        stop_symbol: "</restaurant>"
+        reference_symbol: "$RESTAURANT"
+      }
+      nonterminals {
+        start_symbol: "<song>"
+        stop_symbol: "</song>"
+        reference_symbol: "$SONG"
+      }
+      nonterminals {
+        start_symbol: "<street>"
+        stop_symbol: "</street>"
+        reference_symbol: "$STREET"
+      }
+      nonterminals {
+        start_symbol: "<time>"
+        stop_symbol: "</time>"
+        reference_symbol: "$TIME"
+      }
+      nonterminals {
+        start_symbol: "<unknown>"
+        stop_symbol: "</unknown>"
+        reference_symbol: "$UNKNOWN"
+      }
+      nonterminals {
+        start_symbol: "<year>"
+        stop_symbol: "</year>"
+        reference_symbol: "$YEAR"
+      }
+      lm_params {
+        identifier: STATIC
+      }
+      vocabulary_ref: "rescoring_vocabulary"
+    }
+  }
+}
+thread {
+  stream: "endpointer_events"
+}
+thread {
+  stream: "net_features"
+}
+thread {
+  stream: "end_of_utterance_events"
+}
+session_resource {
+  name: "context"
+  classname: "Context"
+  params {
+    [greco.ContextParams.id] {
+      context_model_ref: "context_model"
+      backoff_alias {
+        alias: "context.fst.CONTACT_NAME_FST"
+        ref: "fst.CONTACT_NAME_FST"
+      }
+      backoff_alias {
+        alias: "context.symbols.CONTACT_NAME_SYMS"
+        ref: "symbols.CONTACT_NAME_SYMS"
+      }
+      recognition_context_ref: "recognition_context"
+    }
+  }
+}
+session_resource {
+  name: "default.neural_network_score_cache"
+  classname: "NNBatchScoreCache"
+  params {
+    [greco.NNBatchScoreCacheResourceParams.id] {
+      output_label_offset: 0
+    }
+  }
+}
+session_resource {
+  name: "decoder_graph"
+  classname: "DynamicDecoderGraph"
+  params {
+    [greco.DynamicDecoderGraphParams.id] {
+      clg_replace_resource: "fst.TERSE.CLG"
+      symbols_resource: "symbols.wordlist"
+      replace_pair {
+        non_terminal: "$CONTACTS"
+        fst_resource: "context.fst.CONTACT_NAME_FST"
+        symbols_resource: "context.symbols.CONTACT_NAME_SYMS"
+      }
+      unique_prons_fst_resource: "fst.TERSE.U"
+    }
+  }
+}
+name: "terse_recognizer:ru_ru:OFFLINE_VOICE_ACTIONS"

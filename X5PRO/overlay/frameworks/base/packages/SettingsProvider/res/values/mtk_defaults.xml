@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <!-- M: Add for AOD settings -->
+    <integer name="def_doze_mode">1</integer>
+    <!-- M: Add for AOD settings -->
+</resources>
