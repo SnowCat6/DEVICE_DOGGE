@@ -1,24 +1,17 @@
-# Inherit for devices that support 64-bit primary and 32-bit secondary zygote startup script
-#ifeq ($(MTK_K64_SUPPORT), yes)
-# $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
-#endif
-
-# Inherit from those products. Most specific first.
-$(call inherit-product, $(SRC_TARGET_DIR)/product/full_base.mk)
 
 # Set target and base project for flavor build
 MTK_TARGET_PROJECT := $(subst full_,,$(TARGET_PRODUCT))
-MTK_BASE_PROJECT := $(MTK_TARGET_PROJECT)
+MTK_BASE_PROJECT := X5PRO
 MTK_PROJECT_FOLDER := $(shell find device/* -maxdepth 1 -name $(MTK_BASE_PROJECT))
 MTK_TARGET_PROJECT_FOLDER := $(shell find device/* -maxdepth 1 -name $(MTK_TARGET_PROJECT))
 
 # This is where we'd set a backup provider if we had one
 #$(call inherit-product, device/sample/products/backup_overlay.mk)
 # Inherit from maguro device
-$(call inherit-product, device/DOOGEE/$(MTK_TARGET_PROJECT)/device.mk)
+$(call inherit-product, device/DOOGEE/X5PRO/device.mk)
 
 # set locales & aapt config.
-include $(MTK_TARGET_PROJECT_FOLDER)/ProjectConfig.mk
+include device/DOOGEE/X5PRO/ProjectConfig.mk
 ifneq (,$(filter OP01%, $(OPTR_SPEC_SEG_DEF)))
   ifeq ($(OP01_COMPATIBLE), yes)
     PRODUCT_LOCALES:=zh_CN en_US zh_TW ja_JP en_GB fr_FR
@@ -34,9 +27,6 @@ endif
 
 # Set those variables here to overwrite the inherited values.
 PRODUCT_MANUFACTURER := alps
-PRODUCT_NAME := full_X5PRO
-PRODUCT_DEVICE := X5PRO
-PRODUCT_MODEL := X5PRO
 PRODUCT_POLICY := android.policy_phone
 PRODUCT_BRAND := DOOGEE
 TARGET_OTA_ASSERT_DEVICE := X5pro

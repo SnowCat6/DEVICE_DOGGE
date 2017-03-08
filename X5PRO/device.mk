@@ -157,6 +157,8 @@ PRODUCT_COPY_FILES += frameworks/av/media/libstagefright/data/media_codecs_googl
 DEVICE_PACKAGE_OVERLAYS += device/mediatek/common/overlay/sd_in_ex_otg
 
 DEVICE_PACKAGE_OVERLAYS += device/DOOGEE/X5PRO/overlay
+DEVICE_PACKAGE_OVERLAYS += device/DOOGEE/$(MTK_TARGET_PROJECT)/overlay
+
 ifdef OPTR_SPEC_SEG_DEF
   ifneq ($(strip $(OPTR_SPEC_SEG_DEF)),NONE)
     OPTR := $(word 1,$(subst _,$(space),$(OPTR_SPEC_SEG_DEF)))
@@ -192,7 +194,7 @@ endif
 # inherit 6752 platform
 $(call inherit-product, device/mediatek/mt6735/device.mk)
 
-$(call inherit-product-if-exists, vendor/DOOGEE/libs/$(MTK_TARGET_PROJECT)/device-vendor.mk)
+$(call inherit-product-if-exists, vendor/DOOGEE/libs/X5PRO/device-vendor.mk)
 
 # setup dm-verity configs.
 #PRODUCT_SYSTEM_VERITY_PARTITION := /dev/block/platform/mtk-msdc.0/11230000.msdc0/by-name/system
