@@ -2,6 +2,8 @@
 # GAPPS apps
 GAPPS_VARIANT := pico
 GAPPS_FORCE_PACKAGE_OVERRIDES := true
+GAPPS_FORCE_WEBVIEW_OVERRIDES := true
+GAPPS_FORCE_BROWSER_OVERRIDES := true
 #GAPPS_FORCE_MATCHING_DPI := true
 #DONT_DEXPREOPT_PREBUILTS := true
 $(call inherit-product-if-exists, vendor/google/build/opengapps-packages.mk)
@@ -25,6 +27,8 @@ ifneq ($(WITH_DEXPREOPT), yes)
 #                    Drive \
 #                    TranslatePrebuilt
 endif
+
+GAPPS_EXCLUDED_PACKAGES := SetupWizard
 
 PRODUCT_PACKAGES += \
 	busybox \
