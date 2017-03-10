@@ -37,12 +37,13 @@ DEVICE_PACKAGE_OVERLAYS += device/mediatek/common/overlay/navbar
 
 # Add proprietary binary files
 PRODUCT_COPY_FILES += \
-	$(call find-copy-subdir-files,*,$(LOCAL_PATH)/system,system) \
-	$(call find-copy-subdir-files,*,$(LOCAL_PATH)/system-$(THIS_ANDROID_VERSION),system)
+	$(call find-copy-subdir-files,*,$(LOCAL_PATH)/system/common/,system) \
+	$(call find-copy-subdir-files,*,$(LOCAL_PATH)/system/system-$(THIS_ANDROID_VERSION),system)
 
 # Add proprietary files to ram-fs for boot.img
 PRODUCT_COPY_FILES += \
-    $(call find-copy-subdir-files,*,$(LOCAL_PATH)/root,root)
+    $(call find-copy-subdir-files,*,$(LOCAL_PATH)/root/common,root) \
+    $(call find-copy-subdir-files,*,$(LOCAL_PATH)/root/root-$(THIS_ANDROID_VERSION),root)
 
 ########################################################
 # Set default USB interface
