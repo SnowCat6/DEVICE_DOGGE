@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialpad_2_letters">"АБВГ
+ABC"</string>
+    <string name="dialpad_3_letters">"ДЕЖЗ
+DEF"</string>
+    <string name="dialpad_4_letters">"ИЙКЛ
+GHI"</string>
+    <string name="dialpad_5_letters">"МНОП
+JKL"</string>
+    <string name="dialpad_6_letters">"РСТУ
+MNO"</string>
+    <string name="dialpad_7_letters">"ФХЦЧ
+PQRS"</string>
+    <string name="dialpad_8_letters">"ШЩЪЫ
+TUV"</string>
+    <string name="dialpad_9_letters">"ЬЭЮЯ
+WXYZ"</string>
+</resources>
