@@ -231,7 +231,7 @@ public class DialerSearchNameMatcher {
         for (int matchIndex = 0; matchIndex < mQueryLength; matchIndex++) {
             matched = false;
             for (MatchItem item : mMatchItems) {
-		if(mQuery.length()<=matchIndex || item.name.length()==0) continue;
+		if(item.name.length()==0) continue;
                 if (item.matchState == DS_NOT_MATCH
                         && charEquals(mQuery.charAt(matchIndex), item.name.charAt(0))) {
                     item.matchState = DS_INITIALS_MATCH;
