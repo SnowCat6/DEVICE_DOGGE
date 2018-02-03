@@ -34,3 +34,4 @@ endif
 #LK_PROJECT ?= X5
 #TRUSTY_PROJECT ?= X5
 
+include $(LOCAL_PATH)/twrp.mk

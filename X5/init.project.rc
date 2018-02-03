@@ -103,9 +103,18 @@ service spm_script /vendor/bin/spm_loader
     class core
     oneshot
 
+service sysinit /system/bin/logwrapper /system/xbin/busybox run-parts /system/etc/init.d
+	user root
+	oneshot
+	disabled
+
+on property:sys.initd=1
+	start sysinit
+
 service sysinitloop /system/bin/logwrapper /system/xbin/busybox run-parts /system/etc/init.d.loop
 	user root
 	disabled
 
 on property:sys.initd.loop=1
 	start sysinitloop
+
