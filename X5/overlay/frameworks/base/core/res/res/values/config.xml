@@ -24,4 +24,21 @@
         <item>reboot</item>
     </string-array>
 
+    <!-- Control the behavior when the user long presses the home button.
+            0 - Nothing
+            1 - Recent apps view in SystemUI
+            2 - Launch assist intent
+         This needs to match the constants in
+         policy/src/com/android/internal/policy/impl/PhoneWindowManager.java
+    -->
+    <!-- M: Change default long press on home behavior to Recent apps view -->
+    <integer name="config_longPressOnHomeBehavior">2</integer>
+
+    <!-- Control the behavior when the user double-taps the home button.
+            0 - Nothing
+            1 - Recent apps view in SystemUI
+         This needs to match the constants in
+         policy/src/com/android/internal/policy/impl/PhoneWindowManager.java
+    -->
+    <integer name="config_doubleTapOnHomeBehavior">1</integer>
 </resources>
