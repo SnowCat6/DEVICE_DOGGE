@@ -25,6 +25,11 @@ PRODUCT_MODEL := X5
 PRODUCT_POLICY := android.policy_phone
 PRODUCT_BRAND := DOOGEE
 
+BUILD_FINGERPRINT := DOOGEE/full_hct6580_weg_c_m/hct6580_weg_c_m:6.0/MRA58K/1472705112:user/test-keys
+PRIVATE_BUILD_DESC := "full_hct6580_weg_c_m-user" "6.0" "MRA58K" "1472705112" "test-keys"
+TARGET_OTA_ASSERT_DEVICE := X5
+PRODUCT_DEFAULT_LOCALE := ru_RU
+
 ifeq ($(TARGET_BUILD_VARIANT), eng)
 KERNEL_DEFCONFIG ?= X5_6580_defconfig
 else
