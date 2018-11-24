@@ -21,7 +21,11 @@ endif
 #PRODUCT_COPY_FILES += $(LOCAL_PATH)/MBR:MBR
 #PRODUCT_COPY_FILES += $(LOCAL_PATH)/MT6735_Android_scatter.txt:MT6735_Android_scatter.txt
 
-# thermal policy
+
+
+# thermal.conf and thermal_eng.conf:with BCCT 
+# thermal_NoBCCT.conf and thermal_eng_NoBCCT.conf:no BCCT 
+# thermal policy no BCCT
 ifeq ($(TARGET_BUILD_VARIANT),eng)
     PRODUCT_COPY_FILES += $(LOCAL_PATH)/thermal_eng.conf:$(TARGET_COPY_OUT_VENDOR)/etc/.tp/thermal.conf:mtk
 else
@@ -116,6 +120,9 @@ PRODUCT_COPY_FILES += frameworks/av/media/libstagefright/data/media_codecs_googl
 PRODUCT_COPY_FILES += device/mediatek/mt6735/media_profiles_mt6735m.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles.xml:mtk
 PRODUCT_PROPERTY_OVERRIDES += media.settings.xml=/vendor/etc/media_profiles.xml
 
+# F2FS filesystem
+PRODUCT_PROPERTY_OVERRIDES += ro.mtk_f2fs_enable=1
+
 # overlay has priorities. high <-> low.
 
 DEVICE_PACKAGE_OVERLAYS += device/mediatek/common/overlay/sd_in_ex_otg
@@ -149,8 +156,11 @@ endif
 ifeq (yes,$(strip $(MTK_GMO_RAM_OPTIMIZE)))
   DEVICE_PACKAGE_OVERLAYS += device/mediatek/common/overlay/slim_ram
 endif
-
 DEVICE_PACKAGE_OVERLAYS += device/mediatek/common/overlay/navbar
+
+ifeq ($(strip $(OPTR_SPEC_SEG_DEF)),NONE)
+    PRODUCT_PACKAGES += DangerDash
+endif
 
 $(call inherit-product, device/mediatek/mt6735/device.mk)
 

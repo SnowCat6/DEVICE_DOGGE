@@ -98,7 +98,7 @@ Only the three quirks included above are recognized at this point:
         </MediaCodec>
         <MediaCodec name="OMX.google.h264.encoder" type="video/avc" update="true">
             <Limit name="measured-frame-rate-320x240" range="49-107" />
-            <Limit name="measured-frame-rate-720x480" range="13-29" />
+            <Limit name="measured-frame-rate-720x480" range="29-64" />
         </MediaCodec>
         <MediaCodec name="OMX.google.vp8.encoder" type="video/x-vnd.on2.vp8" update="true">
             <Limit name="measured-frame-rate-320x180" range="25-55" />
