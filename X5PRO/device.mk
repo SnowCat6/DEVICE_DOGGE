@@ -128,6 +128,8 @@ PRODUCT_PROPERTY_OVERRIDES += ro.mtk_f2fs_enable=1
 DEVICE_PACKAGE_OVERLAYS += device/mediatek/common/overlay/sd_in_ex_otg
 
 DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
+DEVICE_PACKAGE_OVERLAYS += device/DOOGEE/$(MTK_TARGET_PROJECT)/overlay
+
 ifdef OPTR_SPEC_SEG_DEF
   ifneq ($(strip $(OPTR_SPEC_SEG_DEF)),NONE)
     OPTR := $(word 1,$(subst _,$(space),$(OPTR_SPEC_SEG_DEF)))
@@ -164,6 +166,6 @@ endif
 
 $(call inherit-product, device/mediatek/mt6735/device.mk)
 
-$(call inherit-product-if-exists, vendor/mediatek/libs/$(MTK_TARGET_PROJECT)/device-vendor.mk)
+$(call inherit-product-if-exists, vendor/mediatek/libs/$(MTK_BASE_PROJECT)/device-vendor.mk)
 
 include vendor/DOOGEE/prebuilds.mk
